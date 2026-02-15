@@ -1,0 +1,15 @@
+<h1>Static data</h1>
+<p>PC Hostname: {{.StaticData.Hostname}}</p>
+<p>PC Username: {{.StaticData.Username}}</p>
+<p>CPU Name: {{.StaticData.CPU.Name}}</p>
+<p>CPU Cores Amount: {{.StaticData.CPU.CoresAmount}}</p>
+<p>CPU Architecture: {{.StaticData.CPU.Arch}}</p>
+<h1>Dynamic data</h1>
+<div style="display:flex">
+    {{range $ind, $usage := .DynamicData.CPUUsage}}
+    <p>CPU {{$ind}}: {{printf "%.2f" $usage}}%</p>
+    {{end}}
+</div>
+<p>Total RAM: {{.DynamicData.RAM.Total}} bytes</p>
+<p>Used RAM: {{printf "%.2f" .DynamicData.RAM.Used}}%</p>
+<img src="/graphs/image.png">
