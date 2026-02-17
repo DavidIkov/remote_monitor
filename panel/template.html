@@ -5,11 +5,11 @@
 <p>CPU Cores Amount: {{.StaticData.CPU.CoresAmount}}</p>
 <p>CPU Architecture: {{.StaticData.CPU.Arch}}</p>
 <h1>Dynamic data</h1>
-<div style="display:flex">
+<div style="display:flex; flex-wrap:wrap;">
     {{range $ind, $usage := .DynamicData.CPUUsage}}
     <p>CPU {{$ind}}: {{printf "%.2f" $usage}}%</p>
+    <img src='{{ printf "/graphs/cpu%d.png" $ind}}' style="max-width: 200px; max-height: 200px">
     {{end}}
 </div>
 <p>Total RAM: {{.DynamicData.RAM.Total}} bytes</p>
 <p>Used RAM: {{printf "%.2f" .DynamicData.RAM.Used}}%</p>
-<img src="/graphs/image.png">

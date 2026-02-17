@@ -5,34 +5,10 @@ import (
 	"os"
 	"os/user"
 	"runtime"
-	"sync"
-	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/mem"
 )
-
-type StaticCPUData struct {
-	Name        string
-	CoresAmount int
-	Arch        string
-}
-
-type StaticPCData struct {
-	CPU      StaticCPUData
-	Hostname string
-	Username string
-}
-
-type ramInfo struct {
-	Total uint64
-	Used  float32
-}
-
-type DynamicPCData struct {
-	CPUUsage []float32
-	RAM      ramInfo
-}
 
 func GetAverageDynamicPCData(dataRange []DynamicPCData) DynamicPCData {
 	if len(dataRange) == 0 {
@@ -88,35 +64,4 @@ func GetDynamicPCData() DynamicPCData {
 	}
 
 	return DynamicPCData{CPUUsage: cpu_usage, RAM: ramInfo{Total: ram.Total, Used: float32(ram.UsedPercent)}}
-}
-
-type DynamicDataUpdater struct {
-	mutex sync.Mutex
-	data  []DynamicPCData
-	// In milliseconds.
-	measureTime   uint32
-	measureAmount uint32
-}
-
-func (updater *DynamicDataUpdater) Start(measureTime, measureAmount uint32) {
-	updater.measureTime = measureTime
-	updater.measureAmount = measureAmount
-	updater.data = make([]DynamicPCData, measureAmount)
-
-	go func() {
-		for true {
-			data := GetDynamicPCData()
-			updater.mutex.Lock()
-			updater.data = updater.data[1:]
-			updater.data = append(updater.data, data)
-			updater.mutex.Unlock()
-			time.Sleep(time.Duration(measureTime) * time.Millisecond / time.Duration(measureAmount))
-		}
-	}()
-}
-func (updater *DynamicDataUpdater) GetData() DynamicPCData {
-	updater.mutex.Lock()
-	data := GetAverageDynamicPCData(updater.data)
-	updater.mutex.Unlock()
-	return data
 }
